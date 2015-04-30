@@ -5,7 +5,14 @@ module Intercom
     module Save
 
       module ClassMethods
-        def create(params)
+        PARAMS_NOT_PROVIDED = Object.new
+        def create(params = PARAMS_NOT_PROVIDED)
+          if self.ancestors.include?(Intercom::Contact) && params == PARAMS_NOT_PROVIDED
+            params = Hash.new
+          elsif params == PARAMS_NOT_PROVIDED
+            raise ArgumentError, '.create requires 1 parameter'
+          end
+
           instance = self.new(params)
           instance.mark_fields_as_changed!(params.keys)
           instance.save
